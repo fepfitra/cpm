@@ -1,0 +1,50 @@
+#!/bin/bash
+
+if [ $# == 0 ]; then
+  echo "Usage: $0 [init|install|update|help]"
+  exit 1
+fi
+
+if [ $1 == "help" ]; then
+  echo "Usage: $0 [init|install|update|help]"
+  exit 1
+fi
+
+if [ $1 == "init" ]; then
+  echo "Initializing..."
+  echo "#fitrafep/cpm" > packages
+  exit 0
+fi
+
+if [ $1 == "install" ]; then
+  echo "Installing..."
+  cat packages | while read line
+  do
+    if [[ $line == \#* ]]; then
+      continue
+    fi
+    line_dir=$(echo $line | cut -d'/' -f2 | cut -d'.' -f1)
+    echo "Installing $line_dir..."
+    mkdir module/$line_dir 2>/dev/null
+    git clone https://github.com/$line.git module/$line_dir
+  done
+fi
+
+if [ $1 == "update" ]; then
+  echo "Updating..."
+  cd module
+  cat ../packages | while read line
+  do
+    if [[ $line == \#* ]]; then
+      continue
+    fi
+    echo "Updating $line..."
+    line_dir=$(echo $line | cut -d'/' -f2 | cut -d'.' -f1)
+    if [ ! -d $line_dir ]; then
+      echo "Module $line_dir not found. Skipping..."
+      git clone https://github.com/$line.git .
+      continue
+    fi
+    git pull
+  done
+fi

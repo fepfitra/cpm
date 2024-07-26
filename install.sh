@@ -1,0 +1,1 @@
+cp upm ~/.local/bin
