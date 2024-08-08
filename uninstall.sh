@@ -1,1 +1,0 @@
-rm ~/.local/bin/upm

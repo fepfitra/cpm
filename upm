@@ -1,12 +1,14 @@
 #!/bin/bash
 
+help="Usage: upm [init|install|add <repo_name>|remove <repo_name>|list|update|help|selfdestroy]"
+
 if [ $# == 0 ]; then
-  echo "Usage: $0 [init|install|update|help]"
+  echo $help
   exit 1
 fi
 
 if [ $1 == "help" ]; then
-  echo "Usage: $0 [init|install|update|help]"
+  echo $help
   exit 1
 fi
 
@@ -15,6 +17,43 @@ if [ $1 == "init" ]; then
   echo "#fitrafep/cpm" > packages
   exit 0
 fi
+
+if [ ! -f packages ]; then
+  echo "No packages file found. Please run 'upm init' first."
+  exit 1
+fi
+
+if [ ! -d module ]; then
+  echo "No module directory found. Please run 'upm init' first."
+  exit 1
+fi
+
+if [ $1 == "install" ] || [ $1 == "update" ]; then
+  if [ ! -d module ]; then
+    echo "No module directory found. Please run 'upm init' first."
+    exit 1
+  fi
+
+  if [ ! -f packages ]; then
+    echo "No packages file found. Please run 'upm init' first."
+    exit 1
+  fi
+fi
+
+if [ $1 == "add" ]; then
+  if [ $# != 2 ]; then
+    echo "Usage: $0 add <github_repo>"
+    exit 1
+  fi
+  if [ $(grep -c $2 packages) -gt 0 ]; then
+    echo "Package $2 already exists."
+    exit 1
+  fi
+  echo "Adding $2..."
+  echo $2 >> packages
+  exit 0
+fi
+
 
 if [ $1 == "install" ]; then
   echo "Installing..."
@@ -47,4 +86,38 @@ if [ $1 == "update" ]; then
     fi
     git pull
   done
+fi
+
+if [ $1 == "remove" ]; then
+  if [ $# != 2 ]; then
+    echo "Usage: $0 remove <github_repo>"
+    exit 1
+  fi
+  if [ $(grep -c $2 packages) -eq 0 ]; then
+    echo "Package $2 not found."
+    exit 1
+  fi
+  echo "Removing $2..."
+  sed -i "/$2/d" packages
+  line_dir=$(echo $2 | cut -d'/' -f2 | cut -d'.' -f1)
+  rm -rf module/$line_dir
+  exit 0
+fi
+
+if [ $1 == "list" ]; then
+  echo "Listing packages..."
+  cat packages | while read line
+  do
+    if [[ $line == \#* ]]; then
+      continue
+    fi
+    echo $line
+  done
+  exit 0
+fi
+
+if [ $1 == "selfdestroy" ]; then
+  echo "Self-destroying..."
+  rm $0
+  echo "Done, self-destroyed."
 fi
