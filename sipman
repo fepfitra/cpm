@@ -1,14 +1,25 @@
 #!/bin/bash
 
-help="Usage: sipman [init|install|add <repo_name>|remove <repo_name>|list|update|help|selfdestroy]"
+printHelp() {
+  echo "Usage: sipman [init|install|add <package>|remove <package>|list|update|help|selfdestroy]"
+  echo ""
+  echo "init              Initialize"
+  echo "install           Install all packages"
+  echo "add <package>     Add a package"
+  echo "remove <package>  Remove a package"
+  echo "list              List all packages"
+  echo "update            Update all packages"
+  echo "help              Show this help"
+  echo "selfdestroy       Self-destroy this program"
+}
 
 if [ $# == 0 ]; then
-  echo $help
+  printHelp
   exit 1
 fi
 
 if [ $1 == "help" ]; then
-  echo $help
+  printHelp
   exit 1
 fi
 
