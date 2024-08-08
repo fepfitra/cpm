@@ -1,6 +1,6 @@
 #!/bin/bash
 
-help="Usage: upm [init|install|add <repo_name>|remove <repo_name>|list|update|help|selfdestroy]"
+help="Usage: sipman [init|install|add <repo_name>|remove <repo_name>|list|update|help|selfdestroy]"
 
 if [ $# == 0 ]; then
   echo $help
@@ -14,28 +14,34 @@ fi
 
 if [ $1 == "init" ]; then
   echo "Initializing..."
-  echo "#fitrafep/cpm" > packages
+  echo "#fitrafep/sipman" > packages
   exit 0
 fi
 
+if [ $1 == "selfdestroy" ]; then
+  echo "Self-destroying..."
+  rm $0
+  echo "Done, self-destroyed."
+fi
+
 if [ ! -f packages ]; then
-  echo "No packages file found. Please run 'upm init' first."
+  echo "No packages file found. Please run 'sipman init' first."
   exit 1
 fi
 
 if [ ! -d module ]; then
-  echo "No module directory found. Please run 'upm init' first."
+  echo "No module directory found. Please run 'sipman init' first."
   exit 1
 fi
 
 if [ $1 == "install" ] || [ $1 == "update" ]; then
   if [ ! -d module ]; then
-    echo "No module directory found. Please run 'upm init' first."
+    echo "No module directory found. Please run 'sipman init' first."
     exit 1
   fi
 
   if [ ! -f packages ]; then
-    echo "No packages file found. Please run 'upm init' first."
+    echo "No packages file found. Please run 'sipman init' first."
     exit 1
   fi
 fi
@@ -81,7 +87,6 @@ if [ $1 == "update" ]; then
     line_dir=$(echo $line | cut -d'/' -f2 | cut -d'.' -f1)
     if [ ! -d $line_dir ]; then
       echo "Module $line_dir not found. Skipping..."
-      git clone https://github.com/$line.git .
       continue
     fi
     git pull
@@ -116,8 +121,3 @@ if [ $1 == "list" ]; then
   exit 0
 fi
 
-if [ $1 == "selfdestroy" ]; then
-  echo "Self-destroying..."
-  rm $0
-  echo "Done, self-destroyed."
-fi

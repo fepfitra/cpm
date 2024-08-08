@@ -1,1 +1,1 @@
-cp upm ~/.local/bin
+cp sipman ~/.local/bin
